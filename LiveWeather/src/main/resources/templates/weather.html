@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Weather Dashboard</h1>
+        </header>
+        <main>
+            <form action="#" th:action="@{/weather}" method="get" class="search-form">
+                <input type="text" id="city" name="city" placeholder="Введите имя города" required>
+                <button type="submit">Поиск</button>
+            </form>
+            <div class="weather-info" th:if="${weatherData != null}">
+                <div class="current-weather">
+                    <div class="weather-left">
+                        <h2 th:text="${weatherData.location.name}"></h2>
+                        <p class="temperature" th:text="${weatherData.current.temperature} + ' °C'"></p>
+                        <p class="feels-like" th:text="'Ощущается как: ' + ${weatherData.current.feelsLike} + ' °C'"></p>
+                    </div>
+                    <div class="weather-right">
+                        <p class="details">
+                            Влажность: <span th:text="${weatherData.current.humidity}"></span> %<br>
+                            Скорость ветра: <span th:text="${weatherData.current.windSpeed}"></span> км/ч
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="forecast" th:if="${forecastData != null}">
+                <h2>Прогноз на 10 дней</h2>
+                <div class="forecast-container">
+                    <div class="forecast-day no-select" th:each="day : ${forecastData.forecast.forecastDays}">
+                        <div class="day-card">
+                            <h3 class="date" th:text="${@weatherController.formatDate(day.date)}"></h3>
+                            <p class="month" th:text="${@weatherController.formatDateForMonth(day.date)}"></p>
+                            <p>Днём: <span th:text="${day.day.maxTemp}"></span> °C</p>
+                            <p>Ночью: <span th:text="${day.day.minTemp}"></span> °C</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${weatherData == null}">
+                <p>No weather data available. Please enter a valid city name.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const forecastContainer = $('.forecast-container');
+            let isDragging = false;
+            let startX;
+            let scrollLeft;
+
+            forecastContainer.on('mousedown', function(e) {
+                isDragging = true;
+                startX = e.pageX - forecastContainer.offset().left;
+                scrollLeft = forecastContainer.scrollLeft();
+            });
+
+            forecastContainer.on('mouseleave mouseup', function() {
+                isDragging = false;
+            });
+
+            forecastContainer.on('mousemove', function(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                const x = e.pageX - forecastContainer.offset().left;
+                const walk = (x - startX) * 2;
+                forecastContainer.scrollLeft = scrollLeft - walk;
+            });
+        });
+    </script>
+</body>
+</html>
