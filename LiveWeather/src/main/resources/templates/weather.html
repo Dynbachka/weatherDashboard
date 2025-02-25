@@ -21,6 +21,9 @@
                         <h2 th:text="${weatherData.location.name}"></h2>
                         <p class="temperature" th:text="${weatherData.current.temperature} + ' °C'"></p>
                         <p class="feels-like" th:text="'Ощущается как: ' + ${weatherData.current.feelsLike} + ' °C'"></p>
+                        <p class="sky-condition" th:text="'Состояние неба: ' + ${weatherData.current.condition.text}"></p>
+                        <img th:src="@{${weatherData.current.condition.icon}}" alt="Weather Icon" />
+
                     </div>
                     <div class="weather-right">
                         <p class="details">

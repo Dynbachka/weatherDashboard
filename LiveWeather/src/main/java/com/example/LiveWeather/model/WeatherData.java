@@ -73,6 +73,9 @@ public class WeatherData {
         @JsonProperty("wind_kph")
         private double windSpeed;
 
+        @JsonProperty("condition")
+        private Condition condition;
+
         public double getTemperature() {
             return temperature;
         }
@@ -103,6 +106,49 @@ public class WeatherData {
 
         public void setWindSpeed(double windSpeed) {
             this.windSpeed = windSpeed;
+        }
+
+        public Condition getCondition() {
+            return condition;
+        }
+
+        public void setCondition(Condition condition) {
+            this.condition = condition;
+        }
+    }
+
+    @JsonProperty("condition")
+    private Condition condition;
+
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public void setCondition(Condition condition) {
+        this.condition = condition;
+    }
+
+    public static class Condition {
+        @JsonProperty("text")
+        private String text;
+
+        @JsonProperty("icon")
+        private String icon;
+
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public String getIcon() {
+            return icon;
+        }
+
+        public void setIcon(String icon) {
+            this.icon = icon;
         }
     }
 } 
