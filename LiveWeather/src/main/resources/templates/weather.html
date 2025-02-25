@@ -19,11 +19,12 @@
                 <div class="current-weather">
                     <div class="weather-left">
                         <h2 th:text="${weatherData.location.name}"></h2>
-                        <p class="temperature" th:text="${weatherData.current.temperature} + ' °C'"></p>
+                        <p class="sky-condition" th:text="${weatherData.current.condition.text}"></p>
+                        <p class="temperature">
+                            <span th:text="${weatherData.current.temperature} + ' °C'"></span>
+                            <img th:src="@{${weatherData.current.condition.icon}}" alt="Weather Icon" class="weather-icon" />
+                        </p>
                         <p class="feels-like" th:text="'Ощущается как: ' + ${weatherData.current.feelsLike} + ' °C'"></p>
-                        <p class="sky-condition" th:text="'Состояние неба: ' + ${weatherData.current.condition.text}"></p>
-                        <img th:src="@{${weatherData.current.condition.icon}}" alt="Weather Icon" />
-
                     </div>
                     <div class="weather-right">
                         <p class="details">
@@ -40,8 +41,8 @@
                         <div class="day-card">
                             <h3 class="date" th:text="${@weatherController.formatDate(day.date)}"></h3>
                             <p class="month" th:text="${@weatherController.formatDateForMonth(day.date)}"></p>
-                            <p>Днём: <span th:text="${day.day.maxTemp}"></span> °C</p>
-                            <p>Ночью: <span th:text="${day.day.minTemp}"></span> °C</p>
+                            <p>Днём: <span th:text="${day.day.getMaxTemp()}"></span> °C</p>
+                            <p>Ночью: <span th:text="${day.day.getMinTemp()}"></span> °C</p>
                         </div>
                     </div>
                 </div>

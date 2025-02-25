@@ -72,20 +72,19 @@ public class ForecastData {
         @JsonProperty("mintemp_c")
         private double minTemp;
 
-        public double getMaxTemp() {
-            return maxTemp;
-        }
-
         public void setMaxTemp(double maxTemp) {
             this.maxTemp = maxTemp;
         }
 
-        public double getMinTemp() {
-            return minTemp;
-        }
-
         public void setMinTemp(double minTemp) {
             this.minTemp = minTemp;
+        }
+        public int getMaxTemp() {
+            return (int) Math.round(maxTemp);
+        }
+
+        public int getMinTemp() {
+            return (int) Math.round(minTemp);
         }
     }
 

@@ -8,6 +8,8 @@ import com.example.LiveWeather.model.WeatherData;
 import com.example.LiveWeather.model.ForecastData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class WeatherService {
@@ -18,8 +20,28 @@ public class WeatherService {
     @Value("${weatherapi.key}")
     private String apiKey;
 
+    private Map<String, String> skyConditionTranslations;
+
     public WeatherService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+        initializeSkyConditionTranslations();
+    }
+
+    private void initializeSkyConditionTranslations() {
+        skyConditionTranslations = new HashMap<>();
+        skyConditionTranslations.put("Clear", "Ясно");
+        skyConditionTranslations.put("Partly cloudy", "Частично облачно");
+        skyConditionTranslations.put("Overcast", "Пасмурно");
+        skyConditionTranslations.put("Rain", "Дождь");
+        skyConditionTranslations.put("Snow", "Снег");
+        skyConditionTranslations.put("Fog", "Туман");
+        skyConditionTranslations.put("Light rain", "Легкий дождь");
+        skyConditionTranslations.put("Sunny", "Солнечно");
+
+    }
+
+    public String translateSkyCondition(String condition) {
+        return skyConditionTranslations.getOrDefault(condition, condition); 
     }
 
     public WeatherData getWeatherByCity(String city) {
@@ -27,7 +49,9 @@ public class WeatherService {
         try {
             WeatherData weatherData = restTemplate.getForObject(url, WeatherData.class);
             if (weatherData != null && weatherData.getCurrent() != null) {
-                weatherData.getCurrent().setFeelsLike(weatherData.getCurrent().getFeelsLike());
+                String skyCondition = weatherData.getCurrent().getCondition().getText();
+                String translatedCondition = translateSkyCondition(skyCondition);
+                weatherData.getCurrent().getCondition().setText(translatedCondition);
             }
             return weatherData;
         } catch (HttpClientErrorException e) {

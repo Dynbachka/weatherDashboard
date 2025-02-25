@@ -76,17 +76,15 @@ public class WeatherData {
         @JsonProperty("condition")
         private Condition condition;
 
-        public double getTemperature() {
-            return temperature;
+        public int getTemperature() {
+            return (int) Math.round(temperature);
         }
 
-        public void setTemperature(double temperature) {
-            this.temperature = temperature;
+        public int getFeelsLike() {
+            return (int) Math.round(feelsLike);
         }
 
-        public double getFeelsLike() {
-            return feelsLike;
-        }
+        
 
         public void setFeelsLike(double feelsLike) {
             this.feelsLike = feelsLike;
