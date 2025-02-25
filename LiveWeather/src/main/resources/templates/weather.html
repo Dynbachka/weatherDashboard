@@ -41,6 +41,8 @@
                         <div class="day-card">
                             <h3 class="date" th:text="${@weatherController.formatDate(day.date)}"></h3>
                             <p class="month" th:text="${@weatherController.formatDateForMonth(day.date)}"></p>
+                            <p th:text="${day.day.condition.text}"></p>
+                            <img th:src="@{${day.day.condition.icon}}" alt="Weather Icon" class="weather-icon" />
                             <p>Днём: <span th:text="${day.day.getMaxTemp()}"></span> °C</p>
                             <p>Ночью: <span th:text="${day.day.getMinTemp()}"></span> °C</p>
                         </div>

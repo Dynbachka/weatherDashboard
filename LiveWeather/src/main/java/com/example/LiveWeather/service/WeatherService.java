@@ -29,15 +29,30 @@ public class WeatherService {
 
     private void initializeSkyConditionTranslations() {
         skyConditionTranslations = new HashMap<>();
+        skyConditionTranslations.put("Overcast ", "Пасмурно");
+        skyConditionTranslations.put("Cloudy ", "Облачно");
         skyConditionTranslations.put("Clear", "Ясно");
-        skyConditionTranslations.put("Partly cloudy", "Частично облачно");
-        skyConditionTranslations.put("Overcast", "Пасмурно");
         skyConditionTranslations.put("Rain", "Дождь");
         skyConditionTranslations.put("Snow", "Снег");
         skyConditionTranslations.put("Fog", "Туман");
         skyConditionTranslations.put("Light rain", "Легкий дождь");
         skyConditionTranslations.put("Sunny", "Солнечно");
-
+        skyConditionTranslations.put("Showers", "Ливень");
+        skyConditionTranslations.put("Thunderstorms", "Гроза");
+        skyConditionTranslations.put("Partly Cloudy ", "Переменная облачность");
+        skyConditionTranslations.put("Moderate snow", "Небольшой снег");
+        skyConditionTranslations.put("Light freezing rain", "Мокрый снег");
+        skyConditionTranslations.put("Patchy rain nearby", "Местами дождь");
+        skyConditionTranslations.put("Moderate rain", "Умеренный дождь");
+        skyConditionTranslations.put("Light snow", "Легкий снег");
+        skyConditionTranslations.put("Mist", "Туман");
+        skyConditionTranslations.put("Freezing fog", "Морозный туман");
+        
+        
+        
+        
+        
+        
     }
 
     public String translateSkyCondition(String condition) {
@@ -63,7 +78,15 @@ public class WeatherService {
     public ForecastData getForecastByCity(String city) {
         String url = "http://api.weatherapi.com/v1/forecast.json?key=" + apiKey + "&q=" + city + "&days=10";
         try {
-            return restTemplate.getForObject(url, ForecastData.class);
+            ForecastData forecastData = restTemplate.getForObject(url, ForecastData.class);
+            if (forecastData != null && forecastData.getForecast() != null) {
+                for (ForecastData.ForecastDay day : forecastData.getForecast().getForecastDays()) {
+                    String forecastCondition = day.getDay().getCondition().getText();
+                    String translatedForecastCondition = translateSkyCondition(forecastCondition);
+                    day.getDay().getCondition().setText(translatedForecastCondition);
+                }
+            }
+            return forecastData;
         } catch (HttpClientErrorException e) {
             System.err.println("Error fetching forecast data: " + e.getMessage());
             return null;

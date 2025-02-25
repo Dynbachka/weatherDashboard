@@ -72,6 +72,9 @@ public class ForecastData {
         @JsonProperty("mintemp_c")
         private double minTemp;
 
+        @JsonProperty("condition")
+        private Condition condition;
+
         public void setMaxTemp(double maxTemp) {
             this.maxTemp = maxTemp;
         }
@@ -79,12 +82,45 @@ public class ForecastData {
         public void setMinTemp(double minTemp) {
             this.minTemp = minTemp;
         }
+
         public int getMaxTemp() {
             return (int) Math.round(maxTemp);
         }
 
         public int getMinTemp() {
             return (int) Math.round(minTemp);
+        }
+
+        public Condition getCondition() {
+            return condition;
+        }
+
+        public void setCondition(Condition condition) {
+            this.condition = condition;
+        }
+
+        public static class Condition {
+            @JsonProperty("text")
+            private String text;
+
+            @JsonProperty("icon")
+            private String icon;
+
+            public String getText() {
+                return text;
+            }
+
+            public void setText(String text) {
+                this.text = text;
+            }
+
+            public String getIcon() {
+                return icon;
+            }
+
+            public void setIcon(String icon) {
+                this.icon = icon;
+            }
         }
     }
 

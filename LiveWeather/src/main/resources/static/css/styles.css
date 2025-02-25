@@ -30,7 +30,7 @@ header {
 }
 
 header h1 {
-    color: #60d4f1;
+    color: #226cff;
     font-size: 2.5em;
     margin: 0;
 }
@@ -56,10 +56,10 @@ main {
 
 .search-form button {
     padding: 15px 30px;
-    font-size: 18px;
+    font-size: 22px;
     border: none;
     border-radius: 5px;
-    background-color: #60d4f1;
+    background-color: #226cff;
     color: white;
     cursor: pointer;
     margin-left: 10px;
@@ -67,7 +67,7 @@ main {
 }
 
 .search-form button:hover {
-    background-color: #60d4f1;
+    background-color: #004be2;
 }
 
 .weather-info {
@@ -96,8 +96,8 @@ main {
 }
 
 .temperature {
-    font-size: 50px;
-    color: #ff5722;
+    font-size: 70px;
+    color: #226cff;
     margin-top: 10px;
     margin-bottom: 10px;
 }
@@ -110,6 +110,7 @@ main {
 
 .weather-right {
     text-align: right;
+    padding-top: 210px;
 }
 
 .details {
@@ -154,7 +155,7 @@ main {
 
 .day-card h3 {
     margin-top: 0;
-    color: #60d4f1;
+    color: #226cff;
     font-size: 1.5em;
 }
 

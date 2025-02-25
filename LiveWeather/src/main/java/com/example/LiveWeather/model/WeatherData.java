@@ -84,8 +84,6 @@ public class WeatherData {
             return (int) Math.round(feelsLike);
         }
 
-        
-
         public void setFeelsLike(double feelsLike) {
             this.feelsLike = feelsLike;
         }
