@@ -30,6 +30,8 @@ public class WeatherService {
     private void initializeSkyConditionTranslations() {
         skyConditionTranslations = new HashMap<>();
         skyConditionTranslations.put("Overcast ", "Пасмурно");
+        skyConditionTranslations.put("Overcast", "Пасмурно");
+        skyConditionTranslations.put("Partly cloudy", "Переменная облачность");
         skyConditionTranslations.put("Cloudy ", "Облачно");
         skyConditionTranslations.put("Clear", "Ясно");
         skyConditionTranslations.put("Rain", "Дождь");
@@ -47,11 +49,9 @@ public class WeatherService {
         skyConditionTranslations.put("Light snow", "Легкий снег");
         skyConditionTranslations.put("Mist", "Туман");
         skyConditionTranslations.put("Freezing fog", "Морозный туман");
-        
-        
-        
-        
-        
+        skyConditionTranslations.put("Moderate or heavy snow showers", "Умеренный или сильный снегопад");
+        skyConditionTranslations.put("Light snow showers", "Небольшой снежный дождь");
+
         
     }
 

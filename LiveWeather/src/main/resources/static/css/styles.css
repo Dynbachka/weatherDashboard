@@ -1,9 +1,9 @@
 body, html {
     margin: 0;
     padding: 0;
-    height: 100%;
+    /*height: 100%;*/
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #c1f6fd, #ffffff); /* Градиент от светло-голубого к белому */
+    background: linear-gradient(135deg, #c1f6fd, #ffffff); 
     color: #333;
     display: flex;
     justify-content: center;
@@ -26,7 +26,7 @@ header {
     margin-bottom: 20px;
     border-radius: 10px;
     padding: 10px 0;
-    background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный белый фон */
+    background-color: rgba(255, 255, 255, 0.8); 
 }
 
 header h1 {
@@ -76,7 +76,7 @@ main {
 }
 
 .current-weather {
-    background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный белый фон */
+    background-color: rgba(255, 255, 255, 0.8);
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -120,11 +120,11 @@ main {
 
 .forecast {
     margin-top: 30px;
-    /*border: 2px solid rgba(3, 175, 255, 0.5); /* Полупрозрачная граница */
+    
     border-radius: 10px;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный белый фон */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Добавлена тень */
+    background-color: rgba(255, 255, 255, 0.8); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
 }
 
 .forecast-container {
@@ -132,6 +132,7 @@ main {
     overflow-x: auto;
     padding: 15px 0;
     cursor: grab;
+    margin-bottom: 20px;
 }
 
 .forecast-day {
@@ -140,7 +141,7 @@ main {
 }
 
 .day-card {
-    background-color: rgba(255, 255, 255, 0.8); /* Полупрозрачный белый фон */
+    background-color: rgba(255, 255, 255, 0.8); 
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 20px;
@@ -181,4 +182,11 @@ main {
     font-size: 2em;
     margin-bottom: 10px;
     color: #555; 
+}
+
+#map {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
 }
