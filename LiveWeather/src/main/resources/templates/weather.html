@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Weather Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script th:src="@{'https://api-maps.yandex.ru/2.1/?apikey=' + ${yandexApiKey} + '&lang=ru_RU'}" type="text/javascript"></script>
@@ -16,6 +18,15 @@
                 <input type="text" id="city" name="city" placeholder="Введите название города" required>
                 <button type="submit">Поиск</button>
             </form>
+            <div class="no-data-message" th:if="${weatherData == null}">
+                <div class="message-content">
+                    <svg class="info-icon" viewBox="0 0 24 24" width="48" height="48">
+                        <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    <h3>Данные о погоде отсутствуют</h3>
+                    <p>Пожалуйста, введите название города для получения информации о погоде</p>
+                </div>
+            </div>
             <div id="suggestions" class="suggestions"></div>
             <div class="weather-info" id="weather-info" th:if="${weatherData != null}">
                 <div class="current-weather">
@@ -51,9 +62,8 @@
                     </div>
                 </div>
             </div>
-            <div id="map" style="height: 500px; width: 100%; margin-top: 20px; border-radius: 10px; overflow: hidden;"></div>
-            <div th:if="${weatherData == null}">
-                <p>No weather data available. Please enter a valid city name.</p>
+            <div class="map-container" th:if="${weatherData != null}">
+                <div id="map"></div>
             </div>
             <input type="hidden" id="yandexApiKey" th:value="${yandexApiKey}">
         </main>  
@@ -159,7 +169,10 @@
             }
 
             marker = new ymaps.Placemark(coordinates, {
-                balloonContent: city
+                balloonContent: `<div class="custom-balloon"><h3>${city}</h3></div>`
+            }, {
+                preset: 'islands#blueCircleDotIcon',
+                iconColor: '#226cff'
             });
             map.geoObjects.add(marker);
         }
