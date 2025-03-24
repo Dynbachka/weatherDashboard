@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.LiveWeather.service.WeatherService;
 import com.example.LiveWeather.model.WeatherData;
 import com.example.LiveWeather.model.ForecastData;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,9 @@ import java.time.format.DateTimeFormatter;
 @Controller
 public class WeatherController {
     private final WeatherService weatherService;
+    
+    @Value("${yandexApi.key}")
+    private String yandexApiKey;
 
     public WeatherController(WeatherService weatherService) {
         this.weatherService = weatherService;
@@ -28,6 +32,7 @@ public class WeatherController {
             ForecastData forecastData = weatherService.getForecastByCity(city);
             model.addAttribute("forecastData", forecastData);
         }
+        model.addAttribute("yandexApiKey", yandexApiKey);
         return "weather";
     }
 

@@ -2,8 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Weather Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{'https://api-maps.yandex.ru/2.1/?apikey=' + ${yandexApiKey} + '&lang=ru_RU'}" type="text/javascript"></script>
 </head>
 <body>
     <div class="container">
@@ -11,15 +14,29 @@
             <h1>Weather Dashboard</h1>
         </header>
         <main>
-            <form action="#" th:action="@{/weather}" method="get" class="search-form">
-                <input type="text" id="city" name="city" placeholder="Введите имя города" required>
+            <form action="/weather" method="get" class="search-form" onsubmit="return searchWeather();">
+                <input type="text" id="city" name="city" placeholder="Введите название города" required>
                 <button type="submit">Поиск</button>
             </form>
-            <div class="weather-info" th:if="${weatherData != null}">
+            <div class="no-data-message" th:if="${weatherData == null}">
+                <div class="message-content">
+                    <svg class="info-icon" viewBox="0 0 24 24" width="48" height="48">
+                        <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    <h3>Данные о погоде отсутствуют</h3>
+                    <p>Пожалуйста, введите название города для получения информации о погоде</p>
+                </div>
+            </div>
+            <div id="suggestions" class="suggestions"></div>
+            <div class="weather-info" id="weather-info" th:if="${weatherData != null}">
                 <div class="current-weather">
                     <div class="weather-left">
                         <h2 th:text="${weatherData.location.name}"></h2>
-                        <p class="temperature" th:text="${weatherData.current.temperature} + ' °C'"></p>
+                        <p class="sky-condition" th:text="${weatherData.current.condition.text}"></p>
+                        <p class="temperature">
+                            <span th:text="${weatherData.current.temperature} + ' °C'"></span>
+                            <img th:src="@{${weatherData.current.condition.icon}}" alt="Weather Icon" class="weather-icon" />
+                        </p>
                         <p class="feels-like" th:text="'Ощущается как: ' + ${weatherData.current.feelsLike} + ' °C'"></p>
                     </div>
                     <div class="weather-right">
@@ -37,43 +54,167 @@
                         <div class="day-card">
                             <h3 class="date" th:text="${@weatherController.formatDate(day.date)}"></h3>
                             <p class="month" th:text="${@weatherController.formatDateForMonth(day.date)}"></p>
-                            <p>Днём: <span th:text="${day.day.maxTemp}"></span> °C</p>
-                            <p>Ночью: <span th:text="${day.day.minTemp}"></span> °C</p>
+                            <p th:text="${day.day.condition.text}"></p>
+                            <img th:src="@{${day.day.condition.icon}}" alt="Weather Icon" class="weather-icon" />
+                            <p>Днём: <span th:text="${day.day.getMaxTemp()}"></span> °C</p>
+                            <p>Ночью: <span th:text="${day.day.getMinTemp()}"></span> °C</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div th:if="${weatherData == null}">
-                <p>No weather data available. Please enter a valid city name.</p>
+            <div class="map-container" th:if="${weatherData != null}">
+                <div id="map"></div>
             </div>
-        </main>
+            <input type="hidden" id="yandexApiKey" th:value="${yandexApiKey}">
+        </main>  
+        <footer class="about-section">
+            <div class="about-container">
+                <h2>О проекте</h2>
+                <div class="about-content">
+                    <div class="about-block">
+                        <h3>Weather Dashboard</h3>
+                        <p>Проект разработан для отображения актуальной информации о погоде в любом городе мира. 
+                           Используются данные из надежных источников прогноза погоды и геолокации.</p>
+                    </div>
+                    <div class="about-block">
+                        <h3>Возможности</h3>
+                        <ul>
+                            <li>Текущая погода</li>
+                            <li>Прогноз на 10(3) дней</li>
+                            <li>Интерактивная карта</li>
+                            <li>Поиск по городам</li>
+                        </ul>
+                    </div>
+                    <div class="about-block">
+                        <h3>Технологии</h3>
+                        <ul>
+                            <li>Spring Boot</li>
+                            <li>Яндекс.Карты API</li>
+                            <li>WeatherAPI</li>
+                            <li>JavaScript</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="copyright">
+                    <p>2025 Weather Dashboard.</p>
+                </div>
+            </div>
+        </footer>      
     </div>
 
     <script>
-        $(document).ready(function() {
-            const forecastContainer = $('.forecast-container');
-            let isDragging = false;
-            let startX;
-            let scrollLeft;
+        let map;
+        let marker;
 
-            forecastContainer.on('mousedown', function(e) {
-                isDragging = true;
-                startX = e.pageX - forecastContainer.offset().left;
-                scrollLeft = forecastContainer.scrollLeft();
-            });
+        function initMap() {
+            try {
+                const lastLat = sessionStorage.getItem('lastLat');
+                const lastLng = sessionStorage.getItem('lastLng');
+                const lastCity = sessionStorage.getItem('lastCity');
+                const center = lastLat && lastLng ? [lastLat, lastLng] : [55.7558, 37.6173];
+                const zoom = lastLat && lastLng ? 10 : 5;
 
-            forecastContainer.on('mouseleave mouseup', function() {
-                isDragging = false;
-            });
+                map = new ymaps.Map("map", {
+                    center: center,
+                    zoom: zoom
+                });
 
-            forecastContainer.on('mousemove', function(e) {
-                if (!isDragging) return;
-                e.preventDefault();
-                const x = e.pageX - forecastContainer.offset().left;
-                const walk = (x - startX) * 2;
-                forecastContainer.scrollLeft = scrollLeft - walk;
+                if (lastLat && lastLng && lastCity) {
+                    marker = new ymaps.Placemark([lastLat, lastLng], {
+                        balloonContent: lastCity
+                    });
+                    map.geoObjects.add(marker);
+                }
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        }
+
+        function fetchCityCoordinates(city) {
+            const encodedCity = encodeURIComponent(city);
+            const apiKey = document.getElementById('yandexApiKey').value;
+            const url = `https://geocode-maps.yandex.ru/1.x/?geocode=${encodedCity}&apikey=${apiKey}&format=json`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка сети: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const geoObjects = data.response.GeoObjectCollection.featureMember;
+                    if (geoObjects.length > 0) {
+                        const coordinates = geoObjects[0].GeoObject.Point.pos.split(' ').map(Number);
+                        const [longitude, latitude] = coordinates;
+                        updateMapAndMarker([latitude, longitude], city);
+                        document.querySelector('.search-form').submit();
+                    } else {
+                        console.error('Город не найден:', city);
+                        alert('Город не найден');
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка при получении координат:', error);
+                });
+        }
+
+
+        function updateMapAndMarker(coordinates, city) {
+            map.setCenter(coordinates);
+            map.setZoom(10);
+
+            if (marker) {
+                map.geoObjects.remove(marker);
+            }
+
+            marker = new ymaps.Placemark(coordinates, {
+                balloonContent: `<div class="custom-balloon"><h3>${city}</h3></div>`
+            }, {
+                preset: 'islands#blueCircleDotIcon',
+                iconColor: '#226cff'
             });
-        });
+            map.geoObjects.add(marker);
+        }
+
+        function searchWeather() {
+            const cityInput = document.getElementById('city');
+            if (cityInput && cityInput.value) {
+                const encodedCity = encodeURIComponent(cityInput.value);
+                const apiKey = document.getElementById('yandexApiKey').value;
+                const url = `https://geocode-maps.yandex.ru/1.x/?geocode=${encodedCity}&apikey=${apiKey}&format=json`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        const geoObjects = data.response.GeoObjectCollection.featureMember;
+                        if (geoObjects.length > 0) {
+                            const coordinates = geoObjects[0].GeoObject.Point.pos.split(' ').map(Number);
+                            const [longitude, latitude] = coordinates;
+                            sessionStorage.setItem('lastLat', latitude);
+                            sessionStorage.setItem('lastLng', longitude);
+                            sessionStorage.setItem('lastCity', cityInput.value);
+                        }
+                        document.querySelector('.search-form').submit();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        return false;
+                    });
+                return false;
+            }
+            return false;
+        }
+
+        ymaps.ready(initMap);
+
+        window.onload = function() {
+            const cityInput = document.getElementById('city');
+            const weatherInfo = document.getElementById('weather-info');
+            if (cityInput && cityInput.value && weatherInfo.children.length > 0) {
+                fetchCityCoordinates(cityInput.value);
+            }
+        };
     </script>
 </body>
 </html>
